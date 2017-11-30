@@ -1,5 +1,6 @@
  var data;
 
+ /** Function used to convert the array with the content to CSV format */
  function ArrayToCSV(objArray) {
    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
    var str = '';
@@ -18,6 +19,7 @@
    return str;
  }
 
+ /** Function used to enable Download link, add utf-8 encoding and the name of the CSV */
  function CSVFile(title, items, name) {
    if (title) {
      items.unshift(title);
@@ -46,6 +48,7 @@
  }
 
  $(document).ready(function () {
+
    $("#csv-file").change(function (evt) {
      var file = evt.target.files[0];
      Papa.parse(file, {
@@ -77,12 +80,13 @@
            for (var i = 0; i < data.data.length; i++) {
 
              var color = "";
+
              if (i === (data.data.length - 1)) {
                break;
              }
+
              ref = data.data[i].ref_proveedor + data.data[i].referencia;
              colorstring = data.data[i].colores.split(',');
-
 
              for (var j = 0; j < colorstring.length; j++) {
                if (!color) {
@@ -91,12 +95,18 @@
                color += colorstring[j].replace(/\s/g, '') + "-";
 
              }
+
              color = color.substring(0, color.length - 1);
              ref_comb = ref + "-" + color + "-" + data.data[i].marcaje;
-             prova = [ref, ref_comb, data.data[i].descripcion, data.data[i].marcaje, data.data[i].precio_venta, color];
+
+             //Used to store the content of every line of the CSV.
+             prova = [ref, ref_comb, data.data[i].descripcion, data.data[i].marcaje, data.data[i].precio_venta, color]; 
+
              var regExp_marcaje = /\(([^)]+)\)/;
              var marcaje = regExp_marcaje.exec(prova[3]);
              var marcaje_result;
+
+             // We need to change the phrase depending on the number of the colors.
              if (marcaje[1] > 1) {
                marcaje_result = "Marcaje " + marcaje[1] + " Colores";
              }
@@ -106,7 +116,8 @@
              if (marcaje[1] == "1") {
                marcaje_result = "Marcaje " + marcaje[1] + " Color";
              }
-             value.push(prova);
+
+             value.push(prova); 
            }
            value.slice(0).forEach((item) => {
              items.push({
@@ -118,7 +129,7 @@
                precio_venta: JSON.stringify(item[4])
              });
            });
-           CSVFile(columns, items, name);
+           CSVFile(columns, items, name); // We call to the function when the array is made.
          }
        }
      });
