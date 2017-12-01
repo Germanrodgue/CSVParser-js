@@ -78,6 +78,7 @@
 
            var name = 'destino';
            for (var i = 0; i < data.data.length; i++) {
+             console.log(data.data[i]);
 
              var color = "";
 
@@ -99,25 +100,35 @@
              color = color.substring(0, color.length - 1);
              ref_comb = ref + "-" + color + "-" + data.data[i].marcaje;
 
-             //Used to store the content of every line of the CSV.
-             prova = [ref, ref_comb, data.data[i].descripcion, data.data[i].marcaje, data.data[i].precio_venta, color]; 
-
-             var regExp_marcaje = /\(([^)]+)\)/;
-             var marcaje = regExp_marcaje.exec(prova[3]);
              var marcaje_result;
+             if (data.data[i].marcaje == 'S/M') {
 
-             // We need to change the phrase depending on the number of the colors.
-             if (marcaje[1] > 1) {
-               marcaje_result = "Marcaje " + marcaje[1] + " Colores";
-             }
-             if (marcaje[1] < 1) {
                marcaje_result = "Sin Marcaje";
-             }
-             if (marcaje[1] == "1") {
-               marcaje_result = "Marcaje " + marcaje[1] + " Color";
+             } else {
+               var regExp_marcaje = /\(([^)]+)\)/;
+               var marcaje = regExp_marcaje.exec(data.data[i].marcaje);
+
+               // We need to change the phrase depending on the number of the colors.
+               try {
+                 if (marcaje[1] > 1) {
+                   marcaje_result = "Marcaje " + marcaje[1] + " Colores";
+                 }
+                 if (marcaje[1] < 1) {
+                   marcaje_result = "Sin Marcaje";
+                 }
+                 if (marcaje[1] == "1") {
+                   marcaje_result = "Marcaje " + marcaje[1] + " Color";
+                 }
+               } catch (exception) {
+                 marcaje_result = "Marcaje erroneo";
+               }
+
              }
 
-             value.push(prova); 
+             //Used to store the content of every line of the CSV.
+             prova = [ref, ref_comb, data.data[i].descripcion, marcaje_result, data.data[i].precio_venta, color];
+             value.push(prova);
+
            }
            value.slice(0).forEach((item) => {
              items.push({
@@ -125,7 +136,7 @@
                referencia_comb: item[1],
                descripcion: item[2],
                color: item[5],
-               marcaje: marcaje_result,
+               marcaje: item[3],
                precio_venta: JSON.stringify(item[4])
              });
            });
